@@ -6,8 +6,7 @@ Jeu de l'oie « action ou vérité » pour deux, en une seule page web avec un p
 
 Le site est entièrement statique et se trouve dans `public/` : `index.html`, `style.css`, `main.js`, `board3d.js`, `deck.js` et Three.js dans `public/vendor/`. Il n'y a pas de serveur ni de compte, et la page fonctionne hors ligne une fois chargée.
 
-- **Cloudflare Workers** : importer le dépôt depuis GitHub en gardant les réglages par défaut. Le fichier `wrangler.jsonc` indique à Cloudflare de publier le dossier `public/`.
-- **Cloudflare Pages** : Framework preset « None », Build command vide, Build output directory `public`.
+- **Cloudflare Pages** : importer le dépôt depuis GitHub. Le fichier `wrangler.jsonc` indique à Cloudflare de publier le dossier `public/` (Build command vide).
 - **Sur ordinateur** : lancer `python3 -m http.server` dans `public/`, puis ouvrir http://localhost:8000. Un double-clic sur `index.html` ne suffit pas, car les navigateurs bloquent les modules JavaScript en `file://`.
 
 ## Règles
