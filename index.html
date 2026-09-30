@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07060a">
+<title>Dirty Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,900&family=Yellowtail&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <div class="sky"></div>
+
+  <!-- ACCUEIL -->
+  <section id="home" class="screen center-col">
+    <div class="kicker">Action ou vérité · pour deux</div>
+    <div class="logo">
+      <span class="logo-dirty">Dirty</span>
+      <span class="logo-game">Game</span>
+    </div>
+    <div class="center-col" style="gap:18px">
+      <button type="button" class="btn-big pink" data-go="setup">Nouvelle partie &#9654;&#xFE0E;</button>
+      <div class="muted">18+ · Un seul téléphone, à se passer</div>
+    </div>
+  </section>
+
+  <!-- JOUEURS -->
+  <section id="setup" class="screen sheet-wrap">
+    <div class="sheet" style="max-width:600px; gap:22px">
+      <div class="sheet-head">
+        <span class="sheet-title">LES JOUEURS</span>
+        <button type="button" class="btn-close" data-go="home">✕</button>
+      </div>
+      <div class="rule" style="margin-top:-8px"></div>
+      <div id="setupPlayers" class="players-grid"></div>
+      <div style="height:1px; background:#d9d6cf"></div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div style="font-weight:900; font-size:18px">Intensité</div>
+        <div class="grid2">
+          <button type="button" class="seg" id="modeProg">Progressif</button>
+          <button type="button" class="seg" id="modeFixe">Fixe</button>
+        </div>
+        <div id="progInfo" style="display:flex; flex-direction:column; gap:8px">
+          <div class="grid3" style="gap:4px">
+            <div class="bar" style="background:#d98cff"></div>
+            <div class="bar" style="background:#ff5fa2"></div>
+            <div class="bar" style="background:#ff3b3b"></div>
+          </div>
+          <div class="grid3" style="gap:4px; font-weight:800; font-size:13px; color:#4d4a46">
+            <span>Soft</span><span style="text-align:center">Chaud</span><span style="text-align:right">Hot</span>
+          </div>
+          <div style="font-weight:700; font-size:13px; color:#6b6863">De plus en plus intense au fil du plateau, sans savoir où ça change.</div>
+        </div>
+        <div id="fixeInfo" class="grid3" style="gap:8px"></div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; padding-top:4px">
+        <button type="button" class="btn-ink" id="startGame" style="font-size:26px; padding:12px 30px">JOUER &#9654;&#xFE0E;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATEAU 3D -->
+  <section id="board" class="screen">
+    <div id="stage"></div>
+    <div class="hud-top">
+      <div class="hud-row">
+        <button type="button" class="btn-round" data-go="home" aria-label="Accueil">⌂</button>
+        <div class="turn-box">
+          <span class="turn-dot" id="turnDot"></span>
+          <div class="turn-txt">
+            <span class="cap">C'est au tour de</span>
+            <span class="turn-name" id="turnName"></span>
+          </div>
+        </div>
+        <button type="button" class="btn-round" id="openLegend" style="font-size:20px; font-style:italic" aria-label="Les cases">i</button>
+      </div>
+      <div id="chips" class="chips"></div>
+    </div>
+    <div class="hud-bottom">
+      <button type="button" id="roll" class="roll">
+        <span class="roll-label" id="rollLabel">Lancer le dé</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- VICTOIRE -->
+  <section id="win" class="screen center-col" style="gap:22px; overflow:hidden">
+    <div class="win-halo" id="winHalo"></div>
+    <div class="kicker" style="color:#ffd23f; text-shadow:0 0 12px rgba(255,210,63,.7); position:relative">Case 45 · arrivée pile</div>
+    <div class="win-name" id="winName"></div>
+    <div style="position:relative; font-weight:900; font-size:30px">remporte la partie</div>
+    <div id="winSub" style="position:relative; font-size:17px; font-weight:700; color:#cfc8d3; max-width:340px; text-wrap:pretty"></div>
+    <button type="button" class="btn-big" id="goFinal" style="position:relative; margin-top:10px; font-size:21px; padding:15px 28px">Imposer le gage final &#9654;&#xFE0E;</button>
+  </section>
+
+  <!-- GAGE FINAL -->
+  <section id="final" class="screen sheet-wrap">
+    <div class="sheet" style="max-width:480px; gap:16px; box-shadow:0 0 0 3px #ff3b3b, 0 0 70px rgba(255,59,59,.45)">
+      <div class="sheet-head" style="align-items:flex-end">
+        <span class="sheet-title" style="font-size:30px">GAGE FINAL</span>
+        <span class="lvl-tag" style="background:#ff3b3b">HOT</span>
+      </div>
+      <div class="rule"></div>
+      <div id="finalSub" style="font-weight:800; font-size:15px; color:#4d4a46"></div>
+      <div id="finalPick" style="display:flex; flex-direction:column; gap:16px">
+        <div id="finalOptions" style="display:flex; flex-direction:column; gap:8px"></div>
+        <textarea id="finalCustom" placeholder="Ou écris ton propre gage…" rows="3"></textarea>
+        <div style="display:flex; justify-content:flex-end">
+          <button type="button" class="btn-ink" id="imposeFinal" style="font-size:24px; padding:12px 26px">IMPOSER &#9654;&#xFE0E;</button>
+        </div>
+      </div>
+      <div id="finalShow" style="display:flex; flex-direction:column; gap:16px">
+        <div id="finalText" class="card-text" style="font-size:28px; min-height:3.6em"></div>
+        <button type="button" class="btn-ink" id="finalDone" style="font-size:26px; padding:14px">FAIT ✓</button>
+      </div>
+      <div id="finalEnd" style="display:flex; flex-direction:column; gap:16px">
+        <div style="font-weight:800; font-size:22px; line-height:1.3">Partie terminée. Une revanche ?</div>
+        <div class="grid2" style="gap:10px">
+          <button type="button" class="seg" data-go="home" style="background:#e6e4df; color:#333; padding:14px; font-size:17px">Accueil</button>
+          <button type="button" class="seg" id="rematch" style="background:#111; color:#fff; padding:14px; font-size:17px">Revanche</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODALE : CHOIX LIBRE / GAGE À DONNER -->
+  <div id="mChoice" class="modal">
+    <div class="sheet" id="choiceSheet" style="max-width:420px; gap:16px; border-radius:34px; padding:24px">
+      <div class="sheet-head" style="align-items:flex-end">
+        <span class="sheet-title" id="choiceTitle"></span>
+      </div>
+      <div class="rule"></div>
+      <div id="choiceText" style="font-weight:800; font-size:22px; line-height:1.3; text-wrap:pretty"></div>
+      <div class="grid2" style="gap:14px; padding:4px 4px 6px 0">
+        <button type="button" class="btn-ink" id="pickA" style="font-size:22px; padding:16px 6px">ACTION</button>
+        <button type="button" class="btn-ink" id="pickV" style="font-size:22px; padding:16px 6px">VÉRITÉ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE : JOKER -->
+  <div id="mJoker" class="modal">
+    <div class="sheet" style="max-width:420px; gap:16px; border-radius:34px; padding:24px; box-shadow:0 0 0 3px #ffd23f, 0 0 60px rgba(255,210,63,.45)">
+      <div style="display:flex; align-items:center; gap:10px">
+        <span class="sheet-title">JOKER</span><span style="font-size:26px; color:#e0a800">★</span>
+      </div>
+      <div class="rule"></div>
+      <div id="jokerText" style="font-weight:800; font-size:20px; line-height:1.3"></div>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <button type="button" class="opt" id="keepJoker">
+          <span class="opt-t">Éviter mon gage</span>
+          <span class="opt-s">Garde ce joker pour annuler ton prochain gage.</span>
+        </button>
+        <button type="button" class="opt" id="giveGage">
+          <span class="opt-t">Donner un gage à l'autre</span>
+          <span class="opt-s" id="jokerGiveSub"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE : CARTE -->
+  <div id="mCard" class="modal" style="overflow-y:auto">
+    <div class="sheet" id="cardSheet" style="max-width:440px; gap:16px; border-radius:34px; padding:24px 24px 22px">
+      <div class="sheet-head" style="align-items:flex-end">
+        <span class="sheet-title" id="cardType" style="font-size:34px; line-height:1"></span>
+      </div>
+      <div class="rule"></div>
+      <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:14px; color:#4d4a46">
+        <span id="cardPawn" style="width:12px; height:12px; border-radius:50%"></span><span id="cardFor"></span>
+      </div>
+      <div id="cardText" class="card-text"></div>
+      <div id="timer" class="timer">
+        <div style="display:flex; align-items:baseline; gap:2px; min-width:66px">
+          <span id="timerLeft" style="font-weight:900; font-size:38px; line-height:1; font-variant-numeric:tabular-nums"></span><span style="font-weight:900; font-size:18px">s</span>
+        </div>
+        <div class="timer-track"><div id="timerBar" class="timer-bar"></div></div>
+        <button type="button" id="timerBtn" class="timer-btn"></button>
+      </div>
+      <button type="button" class="btn-ink" id="cardDone" style="margin-right:5px; font-size:26px; padding:14px">FAIT ✓</button>
+      <button type="button" class="seg" id="useJoker" style="background:#e6e4df; color:#333; padding:11px; font-size:15px"></button>
+    </div>
+  </div>
+
+  <!-- MODALE : LÉGENDE -->
+  <div id="mLegend" class="modal">
+    <div class="sheet" style="max-width:400px; gap:14px; border-radius:34px; padding:24px">
+      <div class="sheet-head">
+        <span class="sheet-title" style="font-size:26px">LES CASES</span>
+        <button type="button" class="btn-close" id="closeLegend">✕</button>
+      </div>
+      <div class="rule"></div>
+      <div id="legendList" style="display:flex; flex-direction:column; gap:8px"></div>
+      <div style="font-weight:700; font-size:13px; color:#5c5954; line-height:1.4">Il faut tomber pile sur la case 45. Sinon, le pion recule du surplus. Glisse un doigt sur le plateau pour le faire pivoter.</div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast-wrap">
+    <div class="toast" id="toastBox">
+      <div class="toast-title" id="toastTitle"></div>
+      <div class="toast-text" id="toastText"></div>
+    </div>
+  </div>
+</div>
+
+<script src="deck.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
