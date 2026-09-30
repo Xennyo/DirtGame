@@ -146,3 +146,4 @@ button{cursor:pointer}
   .card-text,.card-text.len-m,.card-text.len-l{font-size:21px}
 }
 @media (max-width:360px){.card-text{font-size:26px}.card-text.len-m{font-size:24px}.card-text.len-l{font-size:21px}.card-kind{font-size:52px}}
+.resume-info{display:block;font-size:14px;font-weight:700;opacity:.75;margin-top:4px;font-style:normal}
