@@ -243,13 +243,17 @@ function ensureBoard() {
   }
   return boardReady;
 }
+// Laisse au plateau la place libre entre les bandeaux (en haut/bas en portrait, sur les côtés en paysage)
+const landscape = matchMedia('(orientation: landscape) and (max-height: 560px)');
 function syncInsets() {
   if (!board) return;
-  const top = document.querySelector('.hud-top').getBoundingClientRect().bottom;
-  const bottom = window.innerHeight - document.querySelector('.hud-bottom').getBoundingClientRect().top;
-  board.setInsets(top + 8, bottom + 8);
+  const hudTop = document.querySelector('.hud-top').getBoundingClientRect();
+  const roll = $('roll').getBoundingClientRect();
+  if (landscape.matches) board.setInsets({ top: 10, bottom: 10, left: hudTop.right + 10, right: window.innerWidth - roll.left + 10 });
+  else board.setInsets({ top: hudTop.bottom + 10, bottom: window.innerHeight - roll.top + 10 });
 }
 window.addEventListener('resize', () => requestAnimationFrame(syncInsets));
+window.addEventListener('orientationchange', () => setTimeout(syncInsets, 350));
 
 // ---------- Déroulé d'un tour ----------
 async function moveTo(p, to) {

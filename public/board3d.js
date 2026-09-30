@@ -1,6 +1,5 @@
 // Plateau 3D (Three.js) : 45 cases néon en forme de cœur, deux pions cœur, un dé.
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -114,7 +113,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x07060a);
   scene.fog = new THREE.Fog(0x07060a, 60, 170);
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 400);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 400);
 
   scene.add(new THREE.HemisphereLight(0xffd6ec, 0x140a18, 0.9));
   const key = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -139,7 +138,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   }
 
   const { pts, spacing, box } = heartLayout(count);
-  const R = spacing * 0.43;
+  const R = spacing * 0.47;
   const tileR = n => (n === count ? R * 1.12 : R);
   const P3 = n => new THREE.Vector3(pts[n - 1].x, 0, pts[n - 1].y);
 
@@ -303,66 +302,47 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   die.quaternion.setFromEuler(new THREE.Euler(...DIE_UP[5])).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.5));
   scene.add(die);
 
-  // Caméra, post-traitement
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.enablePan = false;
-  controls.minPolarAngle = 0.12;
-  controls.maxPolarAngle = 1.2;
-  controls.minAzimuthAngle = -1.0;
-  controls.maxAzimuthAngle = 1.0;
+  // Caméra fixe (pas de zoom ni de rotation), post-traitement
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.5, 0.7);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
-  let insets = { top: 120, bottom: 130 };
+  // Zone libre entre les bandeaux de l'interface, en pixels depuis chaque bord
+  let insets = { top: 120, bottom: 130, left: 0, right: 0 };
   function fit() {
     const w = el.clientWidth || window.innerWidth, h = el.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false);
     composer.setSize(w, h);
     camera.aspect = w / h;
     camera.clearViewOffset();
-    const polar = w > h ? 0.78 : 0.6;
+    // Vue presque de dessus, légèrement inclinée : lisible et sans déformation
+    const polar = w > h ? 0.5 : 0.36;
     const target = new THREE.Vector3(0, 0, 0);
     const dir = new THREE.Vector3(0, Math.cos(polar), Math.sin(polar));
-    const band = Math.max(0.2, 2 - (2 * (insets.top + insets.bottom)) / h);
+    const bandY = Math.max(0.2, 2 - (2 * (insets.top + insets.bottom)) / h);
+    const bandX = Math.max(0.2, 2 - (2 * (insets.left + insets.right)) / w);
     const corners = [];
     for (const x of [box.min.x - R, box.max.x + R]) for (const z of [box.min.y - R, box.max.y + R]) for (const y of [0, 1.5]) corners.push(new THREE.Vector3(x, y, z));
-    let d = 10, mid = 0;
-    for (; d < 400; d += 0.5) {
+    let midX = 0, midY = 0, d = 10;
+    for (; d < 400; d += 0.25) {
       camera.position.copy(target).addScaledVector(dir, d);
       camera.lookAt(target);
       camera.updateMatrixWorld();
       camera.updateProjectionMatrix();
       const ps = corners.map(c => c.clone().project(camera));
-      const top = Math.max(...ps.map(p => p.y)), bot = Math.min(...ps.map(p => p.y)), side = Math.max(...ps.map(p => Math.abs(p.x)));
-      mid = (top + bot) / 2;
-      if (side <= 0.96 && top - bot <= band * 0.97) break;
+      const top = Math.max(...ps.map(p => p.y)), bot = Math.min(...ps.map(p => p.y));
+      const right = Math.max(...ps.map(p => p.x)), left = Math.min(...ps.map(p => p.x));
+      midX = (right + left) / 2; midY = (top + bot) / 2;
+      if (right - left <= bandX * 0.96 && top - bot <= bandY * 0.96) break;
     }
-    // Recentre le cœur dans la bande libre entre les bandeaux du haut et du bas
-    const shiftPx = (insets.top - insets.bottom) / 2 + (mid * h) / 2;
-    camera.setViewOffset(w, h, 0, -shiftPx, w, h);
-    follow = h > w;
-    home.copy(target);
-    const dd = follow ? d * 0.62 : d;
-    camera.position.copy(target).addScaledVector(dir, dd);
-    controls.target.copy(target);
-    controls.minDistance = d * 0.35;
-    controls.maxDistance = d * 1.3;
-    controls.update();
-  }
-  // Portrait : la caméra suit le pion en jeu (pincer pour dézoomer)
-  let follow = false, followPawn = 0;
-  const home = new THREE.Vector3(), desired = new THREE.Vector3(), delta = new THREE.Vector3();
-  function updateFollow(dt) {
-    if (!follow) return;
-    desired.copy(home).lerp(pawns[followPawn].g.position, 0.7);
-    desired.y = 0;
-    delta.subVectors(desired, controls.target).multiplyScalar(Math.min(1, dt * 3));
-    controls.target.add(delta);
-    camera.position.add(delta);
+    // Le brouillard suit la distance, sinon le plateau s'assombrit quand la caméra recule (portrait)
+    scene.fog.near = d * 0.9; scene.fog.far = d * 2.6;
+    // Recentre le cœur dans la zone libre
+    const shiftX = (insets.left - insets.right) / 2 - (midX * w) / 2;
+    const shiftY = (insets.top - insets.bottom) / 2 + (midY * h) / 2;
+    camera.setViewOffset(w, h, -shiftX, -shiftY, w, h);
   }
 
   // Petites animations
@@ -381,7 +361,6 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     pawns.forEach((pw, i) => pw.g.position.copy(pawnSpot(i, pw.tile)));
   }
   async function hopPawn(i, tile, dur = 230) {
-    followPawn = i;
     const pw = pawns[i], from = pw.g.position.clone();
     const oldTile = pw.tile;
     pw.tile = tile;
@@ -429,7 +408,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   }
 
   let active = 0, activeColor = new THREE.Color(), turnIdx = 0;
-  function setActive(tile, playerIndex) { active = tile; turnIdx = playerIndex; followPawn = playerIndex; activeColor.set(playerColors[playerIndex]); }
+  function setActive(tile, playerIndex) { active = tile; turnIdx = playerIndex; activeColor.set(playerColors[playerIndex]); }
 
   let running = false, last = performance.now();
   function frame(now) {
@@ -455,18 +434,18 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
       pw.g.rotation.y = Math.atan2(camera.position.x - pw.g.position.x, camera.position.z - pw.g.position.z);
     });
     pinkLight.intensity = 50 + 15 * pulse;
-    updateFollow(dt);
-    controls.update(dt);
     composer.render();
   }
   function start() { if (running) return; running = true; last = performance.now(); fit(); requestAnimationFrame(frame); }
   function stop() { running = false; }
 
   window.addEventListener('resize', () => { if (running) fit(); });
+  // Les iPhone donnent parfois leurs nouvelles dimensions un peu après la rotation
+  window.addEventListener('orientationchange', () => setTimeout(() => { if (running) fit(); }, 350));
 
   return {
     start, stop, setLevels, placePawns, hopPawn, swapPawns, rollDie, setActive,
-    setInsets(top, bottom) { insets = { top, bottom }; if (running) fit(); },
+    setInsets(next) { insets = { top: 0, bottom: 0, left: 0, right: 0, ...next }; if (running) fit(); },
     resetView: fit,
   };
 }
