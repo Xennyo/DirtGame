@@ -1,6 +1,6 @@
 // Configuration Cloudflare Workers : sert le jeu comme un site statique.
 {
-  "name": "dirtgame",
+  "name": "dirtygame",
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./public"
