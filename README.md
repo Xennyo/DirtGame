@@ -4,10 +4,11 @@ Jeu de l'oie « action ou vérité » pour deux, en une seule page web avec un p
 
 ## Jouer
 
-La page est statique : `index.html` avec `style.css`, `main.js`, `board3d.js`, `deck.js` et Three.js dans `vendor/`. Il n'y a pas de serveur ni de compte, et elle fonctionne hors ligne une fois chargée.
+Le site est entièrement statique et se trouve dans `public/` : `index.html`, `style.css`, `main.js`, `board3d.js`, `deck.js` et Three.js dans `public/vendor/`. Il n'y a pas de serveur ni de compte, et la page fonctionne hors ligne une fois chargée.
 
-- **En ligne** : activer GitHub Pages sur la branche `main` (Settings > Pages), puis ouvrir l'adresse sur le téléphone.
-- **Sur ordinateur** : lancer `python3 -m http.server` dans ce dossier, puis ouvrir http://localhost:8000. Un double-clic sur `index.html` ne suffit pas, car les navigateurs bloquent les modules JavaScript en `file://`.
+- **Cloudflare Workers** : importer le dépôt depuis GitHub en gardant les réglages par défaut. Le fichier `wrangler.jsonc` indique à Cloudflare de publier le dossier `public/`.
+- **Cloudflare Pages** : Framework preset « None », Build command vide, Build output directory `public`.
+- **Sur ordinateur** : lancer `python3 -m http.server` dans `public/`, puis ouvrir http://localhost:8000. Un double-clic sur `index.html` ne suffit pas, car les navigateurs bloquent les modules JavaScript en `file://`.
 
 ## Règles
 
@@ -19,7 +20,7 @@ La page est statique : `index.html` avec `style.css`, `main.js`, `board3d.js`, `
 
 ## Modifier les gages
 
-Les gages sont dans `content/gages.md`. Après une modification, lancer la commande suivante pour régénérer `deck.js` :
+Les gages sont dans `content/gages.md`. Après une modification, lancer la commande suivante pour régénérer `public/deck.js` :
 
 ```
 python3 tools/build_deck.py
