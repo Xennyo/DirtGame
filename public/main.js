@@ -1,5 +1,6 @@
 // Dirty Game : logique de partie et interface (écrans repris de la maquette Claude Design).
 import { createBoard } from './board3d.js';
+import { ICONS, iconSvg } from './icons.js';
 
 const COUNT = 45;
 const LV = {
@@ -18,6 +19,7 @@ const TY = {
   B: { label: 'Bonus', glyph: '↻', color: '#ffa53d', size: 110, desc: 'Tu relances le dé' },
   F: { label: 'Arrivée', glyph: '♥', color: '#ff3fa4', size: 130, desc: 'Case 45, à atteindre pile' },
 };
+for (const k in ICONS) TY[k].icon = ICONS[k];
 // Cases 1 à 45 : soft 1–15, chaud 16–30, hot 31–45 (pas de vérité au niveau hot)
 const TILES = ' DAVCABVAJVAEVCA' + 'RVABCVAJVRACEVA' + 'BAARCAJAEARABAF';
 // Couleur unique en jeu : l'intensité d'une case ou d'une carte ne doit pas se deviner
@@ -421,7 +423,7 @@ $('useJoker').onclick = async () => {
 $('openLegend').onclick = () => {
   $('legendList').innerHTML = ['A', 'V', 'C', 'J', 'R', 'E', 'B', 'F'].map(k => {
     const t = TY[k];
-    return `<div class="leg"><span class="leg-ic${t.font === 'script' ? ' script' : ''}" style="color:${t.color}; text-shadow:0 0 6px ${t.color}">${t.glyph}</span><div><b>${t.label}</b><span>${t.desc}</span></div></div>`;
+    return `<div class="leg"><span class="leg-ic">${iconSvg(t.icon, t.color)}</span><div><b>${t.label}</b><span>${t.desc}</span></div></div>`;
   }).join('');
   $('mLegend').classList.add('on');
 };
