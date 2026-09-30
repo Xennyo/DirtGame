@@ -5,6 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { drawIcon } from './icons.js';
 
 const easeInOut = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const easeOut = t => 1 - Math.pow(1 - t, 3);
@@ -200,6 +201,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     c.font = "800 34px 'Nunito', sans-serif";
     c.fillStyle = 'rgba(255,255,255,.7)';
     c.fillText(String(n), w / 2, 46);
+    if (ty.icon) return drawIcon(c, ty.icon, w / 2, w / 2 + 16, 150, ty.color);
     const script = ty.font === 'script';
     c.font = script ? `${ty.size || 150}px 'Yellowtail', cursive` : `900 ${ty.size || 96}px 'Nunito', sans-serif`;
     neonText(c, ty.glyph, w / 2 + (script ? -4 : 0), w / 2 + 22, ty.color, 14);
