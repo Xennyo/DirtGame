@@ -31,7 +31,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const S = {
   screen: 'home',
   players: [{ name: 'Léa', gender: 'F', pos: 1, jokers: 0 }, { name: 'Hugo', gender: 'H', pos: 1, jokers: 0 }],
-  mode: 'progressif', fixedLevel: 'chaud', turn: 0, busy: false,
+  mode: 'progressif', fixedLevel: 'chaud', turn: 0, busy: false, used: [], pending: null,
   card: null, choiceFor: 0, choiceGiven: false,
   timerLeft: 0, timerTotal: 0, timerRunning: false,
   winner: 0, finalStep: 'pick', finalPick: 0,
@@ -42,15 +42,34 @@ const levelAt = pos => (S.mode === 'fixe' ? S.fixedLevel : pos <= 15 ? 'soft' : 
 const other = p => S.players[1 - p];
 
 // ---------- Cartes ----------
-const bags = {};
+// Une carte ne ressort pas dans la même partie (sauf si toutes celles du niveau sont passées)
 function draw(level, type, gender) {
-  const pool = (DECK[level] && DECK[level][type] || []).filter(c => c.g === 'Tous' || c.g === gender);
+  const pool = (DECK[level] && DECK[level][type] || []).map((c, i) => ({ c, id: `${level}.${type}.${i}` }))
+    .filter(x => x.c.g === 'Tous' || x.c.g === gender);
   if (!pool.length) return null;
-  const key = level + type + gender;
-  if (!bags[key] || !bags[key].length) {
-    bags[key] = pool.map((_, i) => i).sort(() => Math.random() - 0.5);
+  let fresh = pool.filter(x => !S.used.includes(x.id));
+  if (!fresh.length) {
+    S.used = S.used.filter(id => !pool.some(x => x.id === id));
+    fresh = pool;
   }
-  return pool[bags[key].pop()];
+  const pick = fresh[Math.floor(Math.random() * fresh.length)];
+  S.used.push(pick.id);
+  return pick.c;
+}
+
+// ---------- Sauvegarde : la partie survit à un rechargement de la page ----------
+const SAVE_KEY = 'dirtygame.partie';
+function save() {
+  try {
+    const { players, mode, fixedLevel, turn, used, card, pending } = S;
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ players, mode, fixedLevel, turn, used, card, pending }));
+  } catch (e) { /* stockage indisponible : on joue sans sauvegarde */ }
+}
+function loadSave() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY)); } catch (e) { return null; }
+}
+function clearSave() {
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* rien */ }
 }
 function personalize(text, p) {
   const me = S.players[p], o = other(p), oF = o.gender === 'F', meF = me.gender === 'F';
@@ -76,6 +95,7 @@ function show(screen) {
   document.querySelectorAll('.screen').forEach(el => el.classList.toggle('on', el.id === screen));
   if (screen === 'board') ensureBoard().then(b => b && b.start());
   else if (board) board.stop();
+  if (screen === 'home') syncHome();
   if (screen === 'setup') renderSetup();
   if (screen === 'win') renderWin();
   if (screen === 'final') renderFinal();
@@ -240,13 +260,18 @@ async function moveTo(p, to) {
 }
 function endTurn() {
   clearInterval(timerIv);
-  S.turn = 1 - S.turn; S.busy = false; S.card = null; S.timerRunning = false;
+  S.turn = 1 - S.turn; S.busy = false; S.card = null; S.timerRunning = false; S.pending = null;
+  save();
   modal(null);
   renderHud();
 }
 function openCard(type, level, p, given) {
   clearInterval(timerIv);
   S.card = makeCard(type, level, p, given);
+  S.pending = null; save();
+  showCard();
+}
+function showCard() {
   S.timerLeft = S.timerTotal = S.card.dur; S.timerRunning = false;
   renderCard();
   modal('mCard');
@@ -272,7 +297,8 @@ async function roll() {
 
 async function resolve(p, chained) {
   const pl = S.players[p], pos = pl.pos, type = TILES[pos], lvl = levelAt(pos);
-  if (pos === COUNT) { await wait(400); S.busy = false; S.winner = p; S.finalStep = 'pick'; S.finalPick = 0; $('finalCustom').value = ''; show('win'); return; }
+  S.pending = { p, chained }; save();
+  if (pos === COUNT) { clearSave(); await wait(400); S.busy = false; S.winner = p; S.finalStep = 'pick'; S.finalPick = 0; $('finalCustom').value = ''; show('win'); return; }
   if (type === 'A' || type === 'V') return openCard(type, lvl, p, false);
   if (type === 'C') {
     if (lvl === 'hot') return openCard('A', lvl, p, false);
@@ -300,7 +326,7 @@ async function resolve(p, chained) {
     await wait(200);
     return endTurn();
   }
-  if (type === 'B') { await toast('Bonus !', `${pl.name} relance le dé.`, '#ffa53d'); S.busy = false; return renderHud(); }
+  if (type === 'B') { await toast('Bonus !', `${pl.name} relance le dé.`, '#ffa53d'); S.busy = false; S.pending = null; save(); return renderHud(); }
   endTurn();
 }
 
@@ -322,12 +348,29 @@ function toggleTimer() {
 
 function resetGame() {
   clearInterval(timerIv);
-  S.turn = 0; S.busy = false; S.card = null;
+  S.turn = 0; S.busy = false; S.card = null; S.used = []; S.pending = null;
   S.players.forEach((p, i) => { p.name = p.name.trim() || `Joueur ${i + 1}`; p.pos = 1; p.jokers = 0; });
   modal(null);
   show('board');
   ensureBoard().then(b => { if (b) { b.setLevels(); b.placePawns([1, 1]); } renderHud(); });
   renderHud();
+  save();
+}
+function resumeGame() {
+  const g = loadSave(); if (!g) return;
+  Object.assign(S, g, { busy: false });
+  clearInterval(timerIv);
+  modal(null);
+  show('board');
+  ensureBoard().then(b => { if (b) { b.setLevels(); b.placePawns(S.players.map(p => p.pos)); } renderHud(); });
+  renderHud();
+  if (S.card) { showCard(); S.busy = true; renderHud(); }
+  else if (S.pending) { S.busy = true; renderHud(); resolve(S.pending.p, S.pending.chained); }
+}
+function syncHome() {
+  const g = loadSave();
+  $('resumeGame').style.display = g ? '' : 'none';
+  if (g) $('resumeInfo').textContent = g.players.map(p => `${p.name} case ${p.pos}`).join(' · ');
 }
 
 // ---------- Événements ----------
@@ -346,6 +389,7 @@ document.addEventListener('input', e => {
 $('modeProg').onclick = () => { S.mode = 'progressif'; syncSetup(); };
 $('modeFixe').onclick = () => { S.mode = 'fixe'; syncSetup(); };
 $('startGame').onclick = resetGame;
+$('resumeGame').onclick = resumeGame;
 $('rematch').onclick = resetGame;
 $('roll').onclick = roll;
 $('pickA').onclick = () => openCard('A', levelAt(S.players[S.turn].pos), S.choiceFor, S.choiceGiven);
