@@ -1,0 +1,46 @@
+<!doctype html><meta charset="utf-8">
+<!-- Dessine l'icône d'écran d'accueil (plateau cœur néon + dé). Ouvrir dans un navigateur, puis enregistrer les images. -->
+<body style="background:#333;margin:0"><canvas id="c" width="1024" height="1024"></canvas>
+<script>
+const c = document.getElementById('c'), x = c.getContext('2d'), W = 1024;
+// fond
+const bg = x.createRadialGradient(W / 2, W * 0.46, 0, W / 2, W / 2, W * 0.72);
+bg.addColorStop(0, '#5a1450'); bg.addColorStop(0.45, '#26092a'); bg.addColorStop(1, '#07060a');
+x.fillStyle = bg; x.fillRect(0, 0, W, W);
+// étoiles
+let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+for (let i = 0; i < 140; i++) { x.fillStyle = `rgba(255,217,238,${0.2 + rnd() * 0.5})`; x.beginPath(); x.arc(rnd() * W, rnd() * W, 1 + rnd() * 2.2, 0, 7); x.fill(); }
+// cœur de cases octogonales
+const heart = t => [16 * Math.sin(t) ** 3, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))];
+const raw = []; for (let i = 0; i <= 4000; i++) raw.push(heart(Math.PI + i / 4000 * Math.PI * 2));
+const cum = [0]; for (let i = 1; i < raw.length; i++) cum.push(cum[i - 1] + Math.hypot(raw[i][0] - raw[i - 1][0], raw[i][1] - raw[i - 1][1]));
+const N = 22, L = cum[cum.length - 1], k = 21, ox = W / 2, oy = W * 0.5;
+const oct = (cx, cy, r) => { x.beginPath(); for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.closePath(); };
+const cols = ['#ff3fa4', '#d98cff', '#ff5fa2'];
+for (let n = 0; n < N; n++) {
+  const d = n / N * L; let j = 0; while (cum[j + 1] < d) j++;
+  const [hx, hy] = raw[j], px = ox + hx * k, py = oy + (hy - 1.4) * k, col = cols[n % 3];
+  oct(px, py, 34); x.fillStyle = '#141118'; x.fill();
+  x.lineWidth = 7; x.strokeStyle = col; x.shadowColor = col;
+  for (const b of [40, 16]) { x.shadowBlur = b; x.stroke(); }
+  x.shadowBlur = 4; x.lineWidth = 2.5; x.strokeStyle = 'rgba(255,255,255,.85)'; x.stroke(); x.shadowBlur = 0;
+}
+// dé au centre
+x.save(); x.translate(W / 2, W * 0.51); x.rotate(-0.2);
+const R = 112, rr = 32;
+x.shadowColor = '#ff3fa4'; x.shadowBlur = 90;
+x.beginPath(); x.roundRect(-R, -R, 2 * R, 2 * R, rr); x.fillStyle = '#ffe1ef'; x.fill();
+x.shadowBlur = 0;
+const g = x.createLinearGradient(-R, -R, R, R); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#ffc2de');
+x.fillStyle = g; x.fill();
+x.fillStyle = '#ff3fa4';
+for (const [a, b] of [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]]) {
+  x.beginPath();
+  if (a === 0) { // point central en cœur
+    x.save(); x.scale(1.9, 1.9); x.translate(0, 1);
+    x.moveTo(0, 12); x.bezierCurveTo(-18, 0, -14, -16, 0, -8); x.bezierCurveTo(14, -16, 18, 0, 0, 12); x.restore();
+  } else x.arc(a * 60, b * 60, 19, 0, 7);
+  x.fill();
+}
+x.restore();
+</script>
