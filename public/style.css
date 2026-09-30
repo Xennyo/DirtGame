@@ -129,18 +129,24 @@ button{cursor:pointer}
 .toast-title{font-family:'Yellowtail',cursive;font-size:46px;line-height:1.1;color:#fff}
 .toast-text{font-size:17px;font-weight:700;line-height:1.4;color:#eee6ef;text-wrap:pretty}
 
-/* Téléphone à l'horizontale : bandeaux plus compacts pour laisser la place au plateau */
-@media (max-height:520px){
-  .hud-top{padding-top:8px;gap:6px}
-  .hud-row{max-width:none}
+/* Téléphone à l'horizontale : l'interface passe sur les côtés, le plateau garde toute la hauteur */
+@media (orientation:landscape) and (max-height:560px){
+  .hud-top{right:auto;bottom:0;width:clamp(150px,24vw,210px);align-items:stretch;justify-content:flex-start;gap:8px;
+    padding:10px 0 10px 12px;padding-left:max(12px,env(safe-area-inset-left));padding-top:max(10px,env(safe-area-inset-top))}
+  .hud-row{max-width:none;display:grid;grid-template-columns:38px 1fr 38px;gap:8px}
+  .hud-row .turn-box{grid-column:1 / -1;grid-row:2}
   .btn-round{width:38px;height:38px;font-size:19px}
-  .turn-box{padding:5px 12px}
-  .turn-name{font-size:17px}
+  #openLegend{grid-column:3;grid-row:1}
+  .turn-box{padding:6px 12px}
+  .turn-name{font-size:18px}
   .zones{display:none}
-  .hud-bottom{align-items:flex-end;padding-bottom:10px}
-  .roll{width:auto;max-width:none;height:58px;padding:0 28px}
-  .roll-label{font-size:30px}
-  .chips{position:absolute;top:56px;left:12px;flex-direction:column;align-items:flex-start}
+  .chips{flex-direction:column;align-items:stretch;justify-content:flex-start}
+  .chip{justify-content:flex-start}
+  .hud-bottom{left:auto;top:0;justify-content:center;padding:0 12px;padding-right:max(12px,env(safe-area-inset-right))}
+  .roll{width:clamp(96px,15vw,132px);height:clamp(96px,15vw,132px);max-width:none;padding:0 10px;border-radius:50%}
+  .roll-label{font-size:clamp(22px,3.6vw,30px);line-height:1.05}
+  .chip{font-size:12px}
+  .turn-txt .cap{font-size:10px;letter-spacing:.08em;white-space:nowrap}
   .card-sheet{min-height:0;gap:10px;padding:16px 20px}
   .card-kind{font-size:44px}
   .card-text,.card-text.len-m,.card-text.len-l{font-size:21px}
