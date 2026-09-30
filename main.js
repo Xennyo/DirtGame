@@ -20,6 +20,8 @@ const TY = {
 };
 // Cases 1 à 45 : soft 1–15, chaud 16–30, hot 31–45 (pas de vérité au niveau hot)
 const TILES = ' DAVCABVAJVAEVCA' + 'RVABCVAJVRACEVA' + 'BAARCAJAEARABAF';
+// Couleur unique en jeu : l'intensité d'une case ou d'une carte ne doit pas se deviner
+const NEON = { color: '#ff3fa4', glow: 'rgba(255,63,164,.45)' };
 const PCOL = ['#ff4fa3', '#4fa8ff'], PGLOW = ['rgba(255,79,163,.55)', 'rgba(79,168,255,.55)'], PSOFT = ['#ffe1ef', '#e0efff'];
 const DECK = window.DECK || { soft: { A: [], V: [] }, chaud: { A: [], V: [] }, hot: { A: [], V: [] } };
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -115,17 +117,10 @@ function syncSetup() {
 }
 
 function renderHud() {
-  const P = S.players, prog = S.mode === 'progressif', col = PCOL[S.turn], lv = LV[levelAt(P[S.turn].pos)];
+  const P = S.players, col = PCOL[S.turn];
   $('turnDot').style.cssText = `background:${col}; box-shadow:0 0 10px ${col}`;
   $('turnName').textContent = P[S.turn].name;
-  $('modeLabel').textContent = prog ? 'Progressif' : 'Niveau fixe';
-  const pill = $('levelPill');
-  pill.textContent = lv.label;
-  pill.style.cssText = `color:${lv.color}; border-color:${lv.color}; box-shadow:0 0 10px ${lv.glow}`;
   $('chips').innerHTML = P.map((p, i) => `<div class="chip" style="border-color:${i === S.turn ? PCOL[i] : '#2a2830'}"><i style="background:${PCOL[i]}"></i><span>${esc(p.name)}</span><em>· case ${p.pos}</em>${p.jokers ? `<b>★ ${p.jokers}</b>` : ''}</div>`).join('');
-  $('zoneLegend').innerHTML = (prog ? ['soft', 'chaud', 'hot'].map((k, i) => ({ k, label: LV[k].label, range: `${i * 15 + 1}–${i * 15 + 15}` }))
-    : [{ k: S.fixedLevel, label: `${LV[S.fixedLevel].label} · niveau fixe`, range: '1–45' }])
-    .map(z => `<div class="zone" style="color:${LV[z.k].color}; text-shadow:0 0 8px ${LV[z.k].color}"><i style="background:${LV[z.k].color}; box-shadow:0 0 8px ${LV[z.k].color}"></i>${z.label}<em>${z.range}</em></div>`).join('');
   const roll = $('roll');
   roll.disabled = S.busy;
   roll.style.borderColor = col;
@@ -137,11 +132,9 @@ function renderHud() {
 
 function renderCard() {
   const c = S.card; if (!c) return;
-  const lv = LV[c.level], P = S.players;
+  const lv = NEON, P = S.players;
   $('cardSheet').style.boxShadow = `0 0 0 3px ${lv.color}, 0 0 60px ${lv.glow}`;
   $('cardType').textContent = c.type === 'A' ? 'ACTION' : 'VÉRITÉ';
-  $('cardLevel').textContent = lv.label;
-  $('cardLevel').style.background = lv.color;
   $('cardPawn').style.background = PCOL[c.player];
   $('cardFor').textContent = `Pour ${P[c.player].name}${c.given ? ` · offert par ${P[1 - c.player].name}` : ''}`;
   $('cardText').textContent = c.text;
@@ -159,12 +152,10 @@ function renderTimer() {
 }
 
 function renderChoice() {
-  const P = S.players, lv = LV[levelAt(P[S.turn].pos)], chooser = P[S.choiceFor];
+  const P = S.players, lv = NEON, chooser = P[S.choiceFor];
   const col = S.choiceGiven ? '#ffd23f' : lv.color, glow = S.choiceGiven ? 'rgba(255,210,63,.45)' : lv.glow;
   $('choiceSheet').style.boxShadow = `0 0 0 3px ${col}, 0 0 60px ${glow}`;
   $('choiceTitle').textContent = S.choiceGiven ? 'GAGE À DONNER' : 'CHOIX LIBRE';
-  $('choiceLevel').textContent = lv.label;
-  $('choiceLevel').style.background = col;
   $('choiceText').textContent = S.choiceGiven ? `${P[S.turn].name}, quel gage pour ${chooser.name} ?` : `${chooser.name}, à toi de choisir.`;
 }
 
@@ -211,7 +202,7 @@ function ensureBoard() {
     boardReady = createBoard($('stage'), {
       count: COUNT,
       typeAt: n => TILES[n],
-      levelColorAt: n => LV[levelAt(n)].color,
+      levelColorAt: () => '#e46cff',
       types: TY,
       playerColors: PCOL,
     }).then(b => {

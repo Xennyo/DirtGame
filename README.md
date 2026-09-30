@@ -12,7 +12,7 @@ La page est statique : `index.html` avec `style.css`, `main.js`, `board3d.js`, `
 ## Règles
 
 - Deux joueurs, un dé de 1 à 6, et un plateau de 45 cases en forme de cœur.
-- L'intensité est **progressive** (Soft pour les cases 1 à 15, Chaud de 16 à 30, Hot de 31 à 45) ou **fixe**.
+- L'intensité est **progressive** (Soft pour les cases 1 à 15, Chaud de 16 à 30, Hot de 31 à 45) ou **fixe**. En jeu, rien n'indique la zone : toutes les cases et les cartes ont la même couleur.
 - Les cases : Action, Vérité, Choix libre, Joker, Recul de 3, Échange de places, Bonus (rejouer) et Arrivée.
 - Il faut tomber pile sur la case 45, sinon le pion recule du surplus. Le gagnant impose ensuite un gage final.
 - Il n'y a pas de vérité au niveau Hot : une case Vérité ou Choix libre y donne une action.

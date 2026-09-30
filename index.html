@@ -52,8 +52,9 @@
             <div class="bar" style="background:#ff3b3b"></div>
           </div>
           <div class="grid3" style="gap:4px; font-weight:800; font-size:13px; color:#4d4a46">
-            <span>Soft · 1–15</span><span style="text-align:center">Chaud · 16–30</span><span style="text-align:right">Hot · 31–45</span>
+            <span>Soft</span><span style="text-align:center">Chaud</span><span style="text-align:right">Hot</span>
           </div>
+          <div style="font-weight:700; font-size:13px; color:#6b6863">De plus en plus intense au fil du plateau, sans savoir où ça change.</div>
         </div>
         <div id="fixeInfo" class="grid3" style="gap:8px"></div>
       </div>
@@ -75,17 +76,12 @@
             <span class="cap">C'est au tour de</span>
             <span class="turn-name" id="turnName"></span>
           </div>
-          <div class="turn-lvl">
-            <span class="cap" id="modeLabel"></span>
-            <span class="lvl-pill" id="levelPill"></span>
-          </div>
         </div>
         <button type="button" class="btn-round" id="openLegend" style="font-size:20px; font-style:italic" aria-label="Les cases">i</button>
       </div>
       <div id="chips" class="chips"></div>
     </div>
     <div class="hud-bottom">
-      <div id="zoneLegend" class="zones"></div>
       <button type="button" id="roll" class="roll">
         <span class="roll-label" id="rollLabel">Lancer le dé</span>
       </button>
@@ -137,7 +133,6 @@
     <div class="sheet" id="choiceSheet" style="max-width:420px; gap:16px; border-radius:34px; padding:24px">
       <div class="sheet-head" style="align-items:flex-end">
         <span class="sheet-title" id="choiceTitle"></span>
-        <span class="lvl-tag" id="choiceLevel"></span>
       </div>
       <div class="rule"></div>
       <div id="choiceText" style="font-weight:800; font-size:22px; line-height:1.3; text-wrap:pretty"></div>
@@ -174,7 +169,6 @@
     <div class="sheet" id="cardSheet" style="max-width:440px; gap:16px; border-radius:34px; padding:24px 24px 22px">
       <div class="sheet-head" style="align-items:flex-end">
         <span class="sheet-title" id="cardType" style="font-size:34px; line-height:1"></span>
-        <span class="lvl-tag" id="cardLevel"></span>
       </div>
       <div class="rule"></div>
       <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:14px; color:#4d4a46">
