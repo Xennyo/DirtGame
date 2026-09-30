@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Génère deck.js à partir de content/gages.md.
+"""Génère public/deck.js à partir de content/gages.md.
 
 Usage : python3 tools/build_deck.py
 Relancer après chaque modification de content/gages.md.
@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "content" / "gages.md"
-OUT = ROOT / "deck.js"
+OUT = ROOT / "public" / "deck.js"
 
 LEVELS = {"soft": "soft", "chaud": "chaud", "hot": "hot"}
 ITEM = re.compile(r"^\d+\.\s+(.*)$")
