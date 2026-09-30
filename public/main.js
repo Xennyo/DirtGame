@@ -31,7 +31,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const S = {
   screen: 'home',
   players: [{ name: 'Léa', gender: 'F', pos: 1, jokers: 0 }, { name: 'Hugo', gender: 'H', pos: 1, jokers: 0 }],
-  mode: 'progressif', fixedLevel: 'chaud', long: false, turn: 0, busy: false,
+  mode: 'progressif', fixedLevel: 'chaud', turn: 0, busy: false,
   card: null, choiceFor: 0, choiceGiven: false,
   timerLeft: 0, timerTotal: 0, timerRunning: false,
   winner: 0, finalStep: 'pick', finalPick: 0,
@@ -109,9 +109,6 @@ function syncSetup() {
   $('modeFixe').classList.toggle('on', !prog);
   $('progInfo').style.display = prog ? 'flex' : 'none';
   $('fixeInfo').style.display = prog ? 'none' : 'grid';
-  $('lenNormal').classList.toggle('on', !S.long);
-  $('lenLong').classList.toggle('on', S.long);
-  $('lenInfo').textContent = S.long ? 'Le dé va de 1 à 3 : deux fois plus de cartes.' : 'Le dé va de 1 à 6.';
   document.querySelectorAll('[data-lvl]').forEach(b => {
     const k = b.dataset.lvl, on = S.fixedLevel === k;
     Object.assign(b.style, { background: on ? LV[k].color : '#fff', borderColor: on ? '#111' : '#d9d6cf', color: on ? '#111' : '#555' });
@@ -256,7 +253,7 @@ function openCard(type, level, p, given) {
 async function roll() {
   if (S.busy) return;
   S.busy = true; renderHud();
-  const v = 1 + Math.floor(Math.random() * (S.long ? 3 : 6));
+  const v = 1 + Math.floor(Math.random() * 6);
   if (board) await board.rollDie(v); else await wait(900);
   await wait(300);
   const p = S.turn, from = S.players[p].pos, target = from + v, name = S.players[p].name;
@@ -346,8 +343,6 @@ document.addEventListener('input', e => {
 });
 $('modeProg').onclick = () => { S.mode = 'progressif'; syncSetup(); };
 $('modeFixe').onclick = () => { S.mode = 'fixe'; syncSetup(); };
-$('lenNormal').onclick = () => { S.long = false; syncSetup(); };
-$('lenLong').onclick = () => { S.long = true; syncSetup(); };
 $('startGame').onclick = resetGame;
 $('rematch').onclick = resetGame;
 $('roll').onclick = roll;
