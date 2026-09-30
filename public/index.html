@@ -165,25 +165,25 @@
   </div>
 
   <!-- MODALE : CARTE -->
-  <div id="mCard" class="modal" style="overflow-y:auto">
-    <div class="sheet" id="cardSheet" style="max-width:440px; gap:16px; border-radius:34px; padding:24px 24px 22px">
-      <div class="sheet-head" style="align-items:flex-end">
-        <span class="sheet-title" id="cardType" style="font-size:34px; line-height:1"></span>
+  <div id="mCard" class="modal card-modal">
+    <div class="sheet card-sheet" id="cardSheet">
+      <div class="card-top">
+        <span class="card-kind" id="cardType"></span>
+        <span class="card-for"><i id="cardPawn"></i><span id="cardFor"></span></span>
       </div>
       <div class="rule"></div>
-      <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:14px; color:#4d4a46">
-        <span id="cardPawn" style="width:12px; height:12px; border-radius:50%"></span><span id="cardFor"></span>
-      </div>
-      <div id="cardText" class="card-text"></div>
-      <div id="timer" class="timer">
-        <div style="display:flex; align-items:baseline; gap:2px; min-width:66px">
-          <span id="timerLeft" style="font-weight:900; font-size:38px; line-height:1; font-variant-numeric:tabular-nums"></span><span style="font-weight:900; font-size:18px">s</span>
+      <div class="card-body"><div id="cardText" class="card-text"></div></div>
+      <div class="card-actions">
+        <div id="timer" class="timer">
+          <div style="display:flex; align-items:baseline; gap:2px; min-width:66px">
+            <span id="timerLeft" style="font-weight:900; font-size:38px; line-height:1; font-variant-numeric:tabular-nums"></span><span style="font-weight:900; font-size:18px">s</span>
+          </div>
+          <div class="timer-track"><div id="timerBar" class="timer-bar"></div></div>
+          <button type="button" id="timerBtn" class="timer-btn"></button>
         </div>
-        <div class="timer-track"><div id="timerBar" class="timer-bar"></div></div>
-        <button type="button" id="timerBtn" class="timer-btn"></button>
+        <button type="button" class="btn-ink" id="cardDone" style="margin-right:5px; font-size:26px; padding:14px">FAIT ✓</button>
+        <button type="button" class="seg" id="useJoker" style="background:#e6e4df; color:#333; padding:11px; font-size:15px"></button>
       </div>
-      <button type="button" class="btn-ink" id="cardDone" style="margin-right:5px; font-size:26px; padding:14px">FAIT ✓</button>
-      <button type="button" class="seg" id="useJoker" style="background:#e6e4df; color:#333; padding:11px; font-size:15px"></button>
     </div>
   </div>
 
