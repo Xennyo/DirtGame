@@ -38,11 +38,6 @@ window.DECK = {
     "d": 10
    },
    {
-    "t": "Murmure à l'oreille de ton/ta partenaire ce que tu as envie de lui faire ce soir.",
-    "g": "Tous",
-    "d": 0
-   },
-   {
     "t": "Embrasse ton/ta partenaire pendant 20 secondes sans le/la toucher avec tes mains.",
     "g": "Tous",
     "d": 20
@@ -51,11 +46,6 @@ window.DECK = {
     "t": "Caresse l'intérieur des cuisses de ton/ta partenaire par-dessus ses vêtements pendant 20 secondes.",
     "g": "Tous",
     "d": 20
-   },
-   {
-    "t": "Fais un strip-tease d'un vêtement de ton choix, en musique.",
-    "g": "H",
-    "d": 0
    },
    {
     "t": "Assieds-toi sur les genoux de ton partenaire et embrasse-le pendant 20 secondes.",
@@ -179,23 +169,8 @@ window.DECK = {
     "d": 20
    },
    {
-    "t": "Fais un lap dance à ton partenaire pendant 30 secondes.",
-    "g": "F",
-    "d": 30
-   },
-   {
     "t": "Embrasse le ventre de ta partenaire en descendant jusqu'à la limite de ses sous-vêtements.",
     "g": "H",
-    "d": 0
-   },
-   {
-    "t": "Laisse ton/ta partenaire t'attacher les mains dans le dos pour le prochain tour.",
-    "g": "Tous",
-    "d": 0
-   },
-   {
-    "t": "Place un glaçon (ou un doigt mouillé) sur le corps de ton/ta partenaire et fais-le glisser où tu veux.",
-    "g": "Tous",
     "d": 0
    }
   ],
@@ -310,11 +285,6 @@ window.DECK = {
     "d": 30
    },
    {
-    "t": "Embrasse tout le corps de ton/ta partenaire, de la tête aux pieds, sans t'arrêter.",
-    "g": "Tous",
-    "d": 0
-   },
-   {
     "t": "Mets-toi au-dessus de ton partenaire et bouge lentement pendant 30 secondes, sans aller plus loin.",
     "g": "F",
     "d": 30
@@ -328,11 +298,6 @@ window.DECK = {
     "t": "Ton/ta partenaire choisit la prochaine position : tenez-la 1 minute.",
     "g": "Tous",
     "d": 60
-   },
-   {
-    "t": "Fais durer le plaisir de ton/ta partenaire : arrête-toi juste avant qu'il/elle n'en puisse plus, trois fois de suite.",
-    "g": "Tous",
-    "d": 0
    },
    {
     "t": "Allonge-toi et laisse ton partenaire utiliser sa bouche sur toi pendant 30 secondes.",
@@ -353,11 +318,6 @@ window.DECK = {
     "t": "Choisis une pièce de la maison (autre que la chambre) : le prochain gage se fera là-bas.",
     "g": "Tous",
     "d": 0
-   },
-   {
-    "t": "Ton/ta partenaire t'impose le rythme pendant 30 secondes : lent, rapide, arrêt, à sa guise.",
-    "g": "Tous",
-    "d": 30
    }
   ],
   "V": []

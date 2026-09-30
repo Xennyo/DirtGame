@@ -15,14 +15,12 @@ Les gages marqués ✍️ viennent d'Olivier, les autres sont des propositions �
 5. ✍️ [F] Twerke pendant 20 secondes.
 6. ✍️ [Tous] Enlève un vêtement.
 7. [Tous] Mordille le lobe de l'oreille de ton/ta partenaire pendant 10 secondes.
-8. [Tous] Murmure à l'oreille de ton/ta partenaire ce que tu as envie de lui faire ce soir.
-9. [Tous] Embrasse ton/ta partenaire pendant 20 secondes sans le/la toucher avec tes mains.
-10. [Tous] Caresse l'intérieur des cuisses de ton/ta partenaire par-dessus ses vêtements pendant 20 secondes.
-11. [H] Fais un strip-tease d'un vêtement de ton choix, en musique.
-12. [F] Assieds-toi sur les genoux de ton partenaire et embrasse-le pendant 20 secondes.
-13. [Tous] Bande les yeux de ton/ta partenaire et embrasse-le/la à 3 endroits de ton choix.
-14. [Tous] Souffle doucement sur la nuque de ton/ta partenaire pendant 15 secondes.
-15. [Tous] Fais un compliment sur le corps de ton/ta partenaire en le touchant à cet endroit.
+8. [Tous] Embrasse ton/ta partenaire pendant 20 secondes sans le/la toucher avec tes mains.
+9. [Tous] Caresse l'intérieur des cuisses de ton/ta partenaire par-dessus ses vêtements pendant 20 secondes.
+10. [F] Assieds-toi sur les genoux de ton partenaire et embrasse-le pendant 20 secondes.
+11. [Tous] Bande les yeux de ton/ta partenaire et embrasse-le/la à 3 endroits de ton choix.
+12. [Tous] Souffle doucement sur la nuque de ton/ta partenaire pendant 15 secondes.
+13. [Tous] Fais un compliment sur le corps de ton/ta partenaire en le touchant à cet endroit.
 
 ### Vérités
 1. Quelle partie de ton corps aimes-tu qu'on embrasse ?
@@ -50,10 +48,7 @@ Les gages marqués ✍️ viennent d'Olivier, les autres sont des propositions �
 8. ✍️ [Tous] Isole-toi et envoie une photo sexy à ton/ta partenaire.
 9. [Tous] Enlève un vêtement de ton/ta partenaire avec les dents.
 10. [Tous] Caresse ton/ta partenaire sous ses sous-vêtements pendant 20 secondes.
-11. [F] Fais un lap dance à ton partenaire pendant 30 secondes.
-12. [H] Embrasse le ventre de ta partenaire en descendant jusqu'à la limite de ses sous-vêtements.
-13. [Tous] Laisse ton/ta partenaire t'attacher les mains dans le dos pour le prochain tour.
-14. [Tous] Place un glaçon (ou un doigt mouillé) sur le corps de ton/ta partenaire et fais-le glisser où tu veux.
+11. [H] Embrasse le ventre de ta partenaire en descendant jusqu'à la limite de ses sous-vêtements.
 
 ### Vérités
 1. Quel fantasme veux-tu réaliser ce soir ?
@@ -82,15 +77,12 @@ Les gages marqués ✍️ viennent d'Olivier, les autres sont des propositions �
 11. [Tous] Caresse ton/ta partenaire jusqu'à ce qu'il/elle te demande d'arrêter (1 minute max).
 12. [Tous] Fais un 69 pendant 30 secondes.
 13. [Tous] Ton/ta partenaire te dicte ce que tu dois lui faire pendant 30 secondes.
-14. [Tous] Embrasse tout le corps de ton/ta partenaire, de la tête aux pieds, sans t'arrêter. _(nouveau)_
-15. [F] Mets-toi au-dessus de ton partenaire et bouge lentement pendant 30 secondes, sans aller plus loin. _(nouveau)_
-16. [H] Plaque doucement ta partenaire contre un mur et embrasse-la partout pendant 30 secondes. _(nouveau)_
-17. [Tous] Ton/ta partenaire choisit la prochaine position : tenez-la 1 minute. _(nouveau)_
-18. [Tous] Fais durer le plaisir de ton/ta partenaire : arrête-toi juste avant qu'il/elle n'en puisse plus, trois fois de suite. _(nouveau)_
-19. [F] Allonge-toi et laisse ton partenaire utiliser sa bouche sur toi pendant 30 secondes. _(nouveau)_
-20. [H] Allonge-toi et laisse ta partenaire utiliser sa bouche sur toi pendant 30 secondes. _(nouveau)_
-21. [Tous] Faites l'amour pendant 1 minute sans vous embrasser, en vous regardant dans les yeux. _(nouveau)_
-22. [Tous] Choisis une pièce de la maison (autre que la chambre) : le prochain gage se fera là-bas. _(nouveau)_
-23. [Tous] Ton/ta partenaire t'impose le rythme pendant 30 secondes : lent, rapide, arrêt, à sa guise. _(nouveau)_
+14. [F] Mets-toi au-dessus de ton partenaire et bouge lentement pendant 30 secondes, sans aller plus loin. _(nouveau)_
+15. [H] Plaque doucement ta partenaire contre un mur et embrasse-la partout pendant 30 secondes. _(nouveau)_
+16. [Tous] Ton/ta partenaire choisit la prochaine position : tenez-la 1 minute. _(nouveau)_
+17. [F] Allonge-toi et laisse ton partenaire utiliser sa bouche sur toi pendant 30 secondes. _(nouveau)_
+18. [H] Allonge-toi et laisse ta partenaire utiliser sa bouche sur toi pendant 30 secondes. _(nouveau)_
+19. [Tous] Faites l'amour pendant 1 minute sans vous embrasser, en vous regardant dans les yeux. _(nouveau)_
+20. [Tous] Choisis une pièce de la maison (autre que la chambre) : le prochain gage se fera là-bas. _(nouveau)_
 
 _Pas de vérités au niveau hot : une case Vérité ou Choix libre donne une action._
