@@ -95,7 +95,19 @@ button{cursor:pointer}
 /* Modales */
 .modal{display:none;position:fixed;inset:0;z-index:50;background:rgba(5,4,7,.74);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px}
 .modal.on{display:flex}
-.card-text{font-weight:800;font-size:27px;line-height:1.28;text-wrap:pretty;min-height:3.8em}
+.card-modal{align-items:flex-start;overflow-y:auto;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
+.card-sheet{max-width:440px;margin:auto 0;gap:16px;border-radius:34px;padding:22px 24px 22px;min-height:min(620px,calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom)))}
+.modal.on .card-sheet{animation:cardIn .5s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes cardIn{from{opacity:0;transform:perspective(900px) rotateY(-70deg) scale(.85)}to{opacity:1;transform:none}}
+.card-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-kind{font-family:'Yellowtail',cursive;font-size:62px;line-height:.9;padding:0 6px 2px 0;color:#ff3fa4;transform:rotate(-4deg);transform-origin:left bottom}
+.card-for{display:inline-flex;align-items:center;gap:7px;background:#111;color:#fff;border-radius:99px;padding:7px 13px 7px 9px;font-weight:800;font-size:14px;margin-bottom:6px}
+.card-for i{width:12px;height:12px;border-radius:50%;flex:none}
+.card-body{flex:1;display:flex;align-items:center;padding:6px 0}
+.card-text{font-weight:800;font-size:30px;line-height:1.25;text-wrap:pretty;overflow-wrap:break-word;hyphens:auto}
+.card-text.len-m{font-size:27px}
+.card-text.len-l{font-size:24px}
+.card-actions{display:flex;flex-direction:column;gap:14px}
 .opt{text-align:left;border-radius:20px;padding:16px 18px;border:2.5px solid #111;background:#fff;color:#111;display:flex;flex-direction:column;gap:4px}
 .opt:hover{background:#111;color:#fff}
 .opt-t{font-weight:900;font-size:20px}
@@ -129,4 +141,8 @@ button{cursor:pointer}
   .roll{width:auto;max-width:none;height:58px;padding:0 28px}
   .roll-label{font-size:30px}
   .chips{position:absolute;top:56px;left:12px;flex-direction:column;align-items:flex-start}
+  .card-sheet{min-height:0;gap:10px;padding:16px 20px}
+  .card-kind{font-size:44px}
+  .card-text,.card-text.len-m,.card-text.len-l{font-size:21px}
 }
+@media (max-width:360px){.card-text{font-size:26px}.card-text.len-m{font-size:24px}.card-text.len-l{font-size:21px}.card-kind{font-size:52px}}

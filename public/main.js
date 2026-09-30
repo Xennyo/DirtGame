@@ -134,10 +134,12 @@ function renderCard() {
   const c = S.card; if (!c) return;
   const lv = NEON, P = S.players;
   $('cardSheet').style.boxShadow = `0 0 0 3px ${lv.color}, 0 0 60px ${lv.glow}`;
-  $('cardType').textContent = c.type === 'A' ? 'ACTION' : 'VÉRITÉ';
+  $('cardType').textContent = c.type === 'A' ? 'Action' : 'Vérité';
+  $('cardType').style.color = lv.color;
   $('cardPawn').style.background = PCOL[c.player];
   $('cardFor').textContent = `Pour ${P[c.player].name}${c.given ? ` · offert par ${P[1 - c.player].name}` : ''}`;
   $('cardText').textContent = c.text;
+  $('cardText').className = `card-text${c.text.length > 110 ? ' len-l' : c.text.length > 70 ? ' len-m' : ''}`;
   $('timer').style.display = c.dur ? 'flex' : 'none';
   $('timerBar').style.background = lv.color;
   const j = P[c.player].jokers;
