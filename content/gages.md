@@ -45,7 +45,7 @@ Les gages marqués ✍️ viennent d'Olivier, les autres sont des propositions �
 5. ✍️ [H] Masse la poitrine de ta partenaire pendant 20 secondes.
 6. ✍️ [Tous] Masse les fesses de ton/ta partenaire pendant 20 secondes.
 7. ✍️ [Tous] Ferme les yeux et laisse ton/ta partenaire te toucher comme il/elle veut pendant 20 secondes.
-8. ✍️ [Tous] Isole-toi et envoie une photo sexy à ton/ta partenaire.
+8. ✍️ [Tous] Prends une photo sexy avec ton/ta partenaire.
 9. [Tous] Enlève un vêtement de ton/ta partenaire avec les dents.
 10. [Tous] Caresse ton/ta partenaire sous ses sous-vêtements pendant 20 secondes.
 11. [H] Embrasse le ventre de ta partenaire en descendant jusqu'à la limite de ses sous-vêtements.
@@ -67,7 +67,7 @@ Les gages marqués ✍️ viennent d'Olivier, les autres sont des propositions �
 1. ✍️ [H] Fais un cunnilingus à ta partenaire pendant 15 secondes. / [F] Fais une fellation à ton partenaire pendant 15 secondes.
 2. ✍️ [F] Mets-toi à quatre pattes et laisse ton partenaire faire ce qu'il veut pendant 20 secondes.
 3. ✍️ [H] Laisse ta partenaire s'asseoir sur ton visage pendant 30 secondes et fais ce que tu as à faire.
-4. ✍️ [Tous] Isole-toi et envoie une vidéo hot à ton/ta partenaire.
+4. ✍️ [Tous] Prends une vidéo hot avec ton/ta partenaire.
 5. [Tous] Déshabille entièrement ton/ta partenaire.
 6. [Tous] Utilise ta bouche sur ton/ta partenaire pendant 30 secondes, à l'endroit de ton choix.
 7. [Tous] Laisse ton/ta partenaire choisir une position et tenez-la 30 secondes.

@@ -154,7 +154,7 @@ window.DECK = {
     "d": 20
    },
    {
-    "t": "Isole-toi et envoie une photo sexy à ton/ta partenaire.",
+    "t": "Prends une photo sexy avec ton/ta partenaire.",
     "g": "Tous",
     "d": 0
    },
@@ -235,7 +235,7 @@ window.DECK = {
     "d": 30
    },
    {
-    "t": "Isole-toi et envoie une vidéo hot à ton/ta partenaire.",
+    "t": "Prends une vidéo hot avec ton/ta partenaire.",
     "g": "Tous",
     "d": 0
    },
