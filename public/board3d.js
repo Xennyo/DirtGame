@@ -9,6 +9,7 @@ import { drawIcon } from './icons.js';
 const easeInOut = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const TILE_H = 0.42;
+const MAX_STRETCH = 1;
 // Faces du dé dans l'ordre de BoxGeometry : +x, -x, +y, -y, +z, -z
 const DIE_FACES = [3, 4, 1, 6, 2, 5];
 const DIE_UP = {
@@ -381,9 +382,9 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     camera.clearViewOffset();
     // Vue presque de dessus, légèrement inclinée : lisible et sans déformation
     const polar = w > h ? 0.5 : 0.36;
-    // En portrait, on étire le cœur pour remplir la hauteur libre (et agrandir les cases)
+    // Étirement du cœur en portrait : désactivé (MAX_STRETCH = 1), Olivier préfère la forme d'origine
     const freeW = Math.max(1, w - insets.left - insets.right), freeH = Math.max(1, h - insets.top - insets.bottom);
-    const sy = Math.round(Math.min(1.8, Math.max(1, (freeH / freeW) / (baseRatio * Math.cos(polar)))) * 50) / 50;
+    const sy = Math.round(Math.min(MAX_STRETCH, Math.max(1, (freeH / freeW) / (baseRatio * Math.cos(polar)))) * 50) / 50;
     if (Math.abs(sy - stretch) > 0.01 || !laidOut) { laidOut = true; relayout(sy); }
     const target = new THREE.Vector3(0, 0, 0);
     const dir = new THREE.Vector3(0, Math.cos(polar), Math.sin(polar));
