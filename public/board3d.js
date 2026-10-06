@@ -17,13 +17,14 @@ const DIE_UP = {
 };
 
 // Points de la courbe en cœur, répartis à distance égale, départ à la pointe du bas.
-function heartLayout(n) {
+// sy étire le cœur en hauteur (téléphone en portrait) : plus de place, donc des cases plus grandes.
+function heartLayout(n, sy = 1) {
   const M = 4000, raw = [];
   for (let i = 0; i <= M; i++) {
     const t = Math.PI + (i / M) * Math.PI * 2;
     const x = 16 * Math.sin(t) ** 3;
     const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-    raw.push(new THREE.Vector2(x, -y));
+    raw.push(new THREE.Vector2(x, -y * sy));
   }
   const cum = [0];
   for (let i = 1; i <= M; i++) cum.push(cum[i - 1] + raw[i].distanceTo(raw[i - 1]));
@@ -137,9 +138,13 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffd9ee, size: 0.35, transparent: true, opacity: 0.7, fog: false })));
   }
 
-  const { pts, spacing, box } = heartLayout(count);
-  const R = spacing * 0.47;
-  const tileR = n => (n === count ? R * 1.12 : R);
+  // Disposition du cœur : recalculée selon la forme de l'écran (voir relayout).
+  // Les objets sont construits à la taille de référence R0 puis mis à l'échelle k = R / R0.
+  const base = heartLayout(count, 1);
+  const R0 = base.spacing * 0.47;
+  const baseRatio = (base.box.max.y - base.box.min.y + 2 * R0) / (base.box.max.x - base.box.min.x + 2 * R0);
+  let pts = base.pts, box = base.box, R = R0, k = 1, stretch = 1, laidOut = false;
+  const tileR = n => (n === count ? R0 * 1.12 : R0);
   const P3 = n => new THREE.Vector3(pts[n - 1].x, 0, pts[n - 1].y);
 
   // Halo au sol
@@ -155,7 +160,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   }
 
   // Titre néon au centre
-  const textZ = box.getCenter(new THREE.Vector2()).y + (box.max.y - box.min.y) * 0.02;
+  let textZ = 0;
   const drawTitle = () => canvasTex(1024, 640, (c, w, h) => {
       c.textAlign = 'center'; c.textBaseline = 'middle';
       c.translate(w / 2, h / 2); c.rotate(-0.12);
@@ -169,7 +174,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     const width = (box.max.x - box.min.x) * 0.5;
     const m = new THREE.Mesh(flat(new THREE.PlaneGeometry(width, width * 0.625)), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false }));
     m.material.color.setScalar(1.25);
-    m.position.set(0, 0.05, textZ);
+    m.position.y = 0.05;
     scene.add(m);
     titleMesh = m;
   }
@@ -252,7 +257,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
 
   // Pions
   const heartGeo = heartGeometry();
-  const pawnScale = (R * 1.7) / 23;
+  const pawnScale = (R0 * 1.7) / 23;
   const pawns = playerColors.map((col, i) => {
     const g = new THREE.Group();
     const mat = new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.12, sheen: 0.4, emissive: new THREE.Color(col), emissiveIntensity: 0.12 });
@@ -278,15 +283,15 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
       blush.scale.set(1.3, 0.8, 1);
       heart.add(blush);
     }
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.36, R * 0.42, 0.14, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(1.6), toneMapped: false }));
-    base.position.y = 0.07;
-    g.add(base);
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(R0 * 0.36, R0 * 0.42, 0.14, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(1.6), toneMapped: false }));
+    disc.position.y = 0.07;
+    g.add(disc);
     scene.add(g);
     return { g, heart, tile: 1, hop: 0, phase: i * 1.7 };
   });
 
   // Dé
-  const dieSize = R * 1.35;
+  const dieSize = R0 * 1.35, dieHalf = () => (dieSize * k) / 2;
   const pipTex = v => canvasTex(256, 256, (c, w) => {
     const g = c.createLinearGradient(0, 0, w, w);
     g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#ffd3e9');
@@ -297,10 +302,67 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     for (const k of P) { c.beginPath(); c.arc(w * (0.25 + 0.25 * (k % 3)), w * (0.25 + 0.25 * Math.floor(k / 3)), w * 0.085, 0, Math.PI * 2); c.fill(); }
   });
   const die = new THREE.Mesh(new THREE.BoxGeometry(dieSize, dieSize, dieSize), DIE_FACES.map(v => new THREE.MeshStandardMaterial({ map: pipTex(v), roughness: 0.3, emissive: 0xffffff, emissiveIntensity: 0.08 })));
-  const dieHome = new THREE.Vector3((box.max.x - box.min.x) * 0.2, dieSize / 2, textZ - (box.max.y - box.min.y) * 0.15);
-  die.position.copy(dieHome);
+  const dieHome = new THREE.Vector3();
   die.quaternion.setFromEuler(new THREE.Euler(...DIE_UP[5])).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.5));
   scene.add(die);
+  // Ombre douce sous le dé et éclat lumineux quand il touche le plateau
+  const blob = (inner, outer) => canvasTex(128, 128, (c, w) => {
+    const g = c.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    g.addColorStop(0, inner); g.addColorStop(1, outer);
+    c.fillStyle = g; c.fillRect(0, 0, w, w);
+  });
+  const dieShadow = new THREE.Mesh(flat(new THREE.PlaneGeometry(dieSize * 1.9, dieSize * 1.9)), new THREE.MeshBasicMaterial({ map: blob('rgba(0,0,0,.75)', 'rgba(0,0,0,0)'), transparent: true, depthWrite: false }));
+  const dieGlow = new THREE.Mesh(flat(new THREE.PlaneGeometry(dieSize * 4, dieSize * 4)), new THREE.MeshBasicMaterial({ map: blob('rgba(255,120,200,1)', 'rgba(255,63,164,0)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0 }));
+  dieShadow.position.y = 0.02; dieGlow.position.y = 0.03;
+  scene.add(dieShadow, dieGlow);
+  let glowLevel = 0;
+  // Chiffre néon qui apparaît au-dessus du dé
+  const numSprite = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false, depthTest: false, toneMapped: false, opacity: 0 }));
+  numSprite.renderOrder = 10;
+  scene.add(numSprite);
+  const numTex = {};
+  const numberTex = v => numTex[v] || (numTex[v] = canvasTex(256, 256, (c, w) => {
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = "900 170px 'Nunito', sans-serif";
+    neonText(c, String(v), w / 2, w / 2 + 8, '#ff3fa4', 22);
+  }));
+
+  // Onde lumineuse et faisceau sur la case où le pion s'arrête
+  const waves = [0, 1].map(() => {
+    const m = new THREE.Mesh(geoFor(R0)[1], new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending }));
+    m.visible = false;
+    scene.add(m);
+    return m;
+  });
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(R0 * 0.85, R0 * 0.95, R0 * 7, 32, 1, true), new THREE.MeshBasicMaterial({
+    map: canvasTex(8, 128, (c, w, h) => {
+      const g = c.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.7, 'rgba(255,255,255,.35)'); g.addColorStop(1, 'rgba(255,255,255,1)');
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+    }),
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0,
+  }));
+  beam.visible = false;
+  scene.add(beam);
+  let flash = { n: 0, v: 0 };
+
+  // Place tout selon l'étirement du cœur (1 = cœur d'origine)
+  function relayout(sy) {
+    const L = heartLayout(count, sy);
+    pts = L.pts; box = L.box; stretch = sy;
+    R = L.spacing * 0.47; k = R / R0;
+    textZ = box.getCenter(new THREE.Vector2()).y + (box.max.y - box.min.y) * 0.02;
+    titleMesh.position.z = textZ;
+    titleMesh.scale.setScalar(Math.min(1.25, 0.9 + 0.35 * (sy - 1)));
+    for (const t of tiles) { t.grp.position.copy(P3(t.n)); t.grp.scale.set(k, 1, k); }
+    pawns.forEach(pw => pw.g.scale.setScalar(k));
+    pawns.forEach((pw, i) => pw.g.position.copy(pawnSpot(i, pw.tile)));
+    die.scale.setScalar(k);
+    dieShadow.scale.setScalar(k); dieGlow.scale.setScalar(k);
+    dieHome.set((box.max.x - box.min.x) * 0.2, dieHalf(), textZ - (box.max.y - box.min.y) * 0.15);
+    die.position.copy(dieHome);
+    beam.scale.setScalar(k);
+  }
 
   // Caméra fixe (pas de zoom ni de rotation), post-traitement
   const composer = new EffectComposer(renderer);
@@ -319,6 +381,10 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     camera.clearViewOffset();
     // Vue presque de dessus, légèrement inclinée : lisible et sans déformation
     const polar = w > h ? 0.5 : 0.36;
+    // En portrait, on étire le cœur pour remplir la hauteur libre (et agrandir les cases)
+    const freeW = Math.max(1, w - insets.left - insets.right), freeH = Math.max(1, h - insets.top - insets.bottom);
+    const sy = Math.round(Math.min(1.8, Math.max(1, (freeH / freeW) / (baseRatio * Math.cos(polar)))) * 50) / 50;
+    if (Math.abs(sy - stretch) > 0.01 || !laidOut) { laidOut = true; relayout(sy); }
     const target = new THREE.Vector3(0, 0, 0);
     const dir = new THREE.Vector3(0, Math.cos(polar), Math.sin(polar));
     const bandY = Math.max(0.2, 2 - (2 * (insets.top + insets.bottom)) / h);
@@ -387,24 +453,87 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
       b.g.position.lerpVectors(fb, tb, e); b.g.position.y += lift;
     });
   }
+  // Le dé est lancé depuis le bas de l'écran, rebondit et roule jusqu'au centre du cœur
   async function rollDie(v) {
-    const from = die.position.clone();
+    const half = dieHalf(), H = box.max.y - box.min.y, W = box.max.x - box.min.x;
     const qFinal = new THREE.Quaternion().setFromEuler(new THREE.Euler(...DIE_UP[v]))
       .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (Math.random() - 0.5) * 1.2));
-    const axis = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
-    const turns = Math.PI * (5 + Math.random() * 3);
-    const land = dieHome.clone().add(new THREE.Vector3((Math.random() - 0.5) * R * 1.5, 0, (Math.random() - 0.5) * R));
-    const spin = new THREE.Quaternion();
-    await tween(1100, t => {
-      const e = easeOut(t);
-      die.position.lerpVectors(from, land, e);
-      const hop = t < 0.72 ? Math.sin((Math.PI * t) / 0.72) * R * 4.5 : Math.sin((Math.PI * (t - 0.72)) / 0.28) * R * 0.5;
-      die.position.y = dieSize / 2 + hop;
-      spin.setFromAxisAngle(axis, turns * (1 - e));
-      die.quaternion.copy(qFinal).multiply(spin);
+    // Atterrit au-dessus ou en dessous du titre, sans le cacher
+    const above = Math.random() < 0.5;
+    const land = new THREE.Vector3((Math.random() - 0.5) * W * (above ? 0.5 : 0.25), half, textZ + (above ? -1 : 1) * H * (0.19 + Math.random() * 0.05));
+    const from = new THREE.Vector3(land.x + (Math.random() - 0.5) * W * 0.5, half + R * 6, box.max.y + R * 5);
+    const dir = new THREE.Vector3().subVectors(land, from).setY(0);
+    const dist = dir.length();
+    dir.normalize();
+    const rollAxis = new THREE.Vector3(0, 1, 0).cross(dir).normalize();
+    const tumbleAxis = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+    const tumble = Math.PI * (2 + Math.random() * 2);
+    // Rebonds : [début, fin, hauteur]
+    const hops = [[0.38, 0.62, R * 1.8], [0.62, 0.78, R * 0.7], [0.78, 0.88, R * 0.22]];
+    let impacts = 0;
+    const impact = strength => {
+      glowLevel = Math.max(glowLevel, strength);
+      if (navigator.vibrate) navigator.vibrate(Math.round(10 + 25 * strength));
+    };
+    const qa = new THREE.Quaternion(), qb = new THREE.Quaternion();
+    numSprite.material.opacity = 0;
+    await tween(1500, t => {
+      // Avance rapide puis ralentit, le dé roule sur la distance qui reste
+      const e = 1 - Math.pow(1 - t, 2.4);
+      const left = dist * (1 - e);
+      die.position.copy(land).addScaledVector(dir, -left);
+      let y = 0;
+      if (t < 0.38) { const u = t / 0.38; y = (1 - u) * (from.y - half) + 4 * u * (1 - u) * R * 2.5; }
+      for (const [a, b, peak] of hops) if (t >= a && t < b) { const u = (t - a) / (b - a); y = 4 * u * (1 - u) * peak; }
+      die.position.y = half + y;
+      const n = t < 0.38 ? 0 : t < 0.62 ? 1 : t < 0.78 ? 2 : 3;
+      while (impacts < n) { impacts++; impact([1, 0.6, 0.3][impacts - 1]); }
+      qa.setFromAxisAngle(rollAxis, -left / half);
+      qb.setFromAxisAngle(tumbleAxis, tumble * Math.pow(1 - Math.min(1, t / 0.62), 2));
+      die.quaternion.copy(qa).multiply(qb).multiply(qFinal);
     });
-    die.position.y = dieSize / 2;
+    die.position.copy(land);
     die.quaternion.copy(qFinal);
+    // Le résultat s'affiche en néon au-dessus du dé
+    numSprite.material.map = numberTex(v);
+    numSprite.material.needsUpdate = true;
+    const size = R * 4.2;
+    tween(1300, t => {
+      const pop = t < 0.25 ? easeOut(t / 0.25) * 1.15 : 1.15 - 0.15 * Math.min(1, (t - 0.25) / 0.15);
+      numSprite.scale.setScalar(size * pop);
+      numSprite.position.set(land.x, half * 2 + R * 1.6 + t * R * 1.2, land.z);
+      numSprite.material.opacity = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
+    });
+    await new Promise(r => setTimeout(r, 450));
+  }
+
+  // La case d'arrivée s'allume : onde, faisceau et petit saut de la case
+  async function landOn(n, color = '#ff3fa4') {
+    const tile = tiles[n - 1], p = tile.grp.position, col = new THREE.Color(color).multiplyScalar(2.2);
+    for (const w of waves) { w.position.set(p.x, TILE_H + 0.1, p.z); w.material.color.copy(col); w.visible = true; w.scale.setScalar(0.001); }
+    beam.position.set(p.x, TILE_H + (R0 * 7 * k) / 2, p.z);
+    beam.material.color.copy(col).multiplyScalar(0.6);
+    beam.visible = true;
+    flash.n = n;
+    await tween(720, t => {
+      waves.forEach((w, i) => {
+        const u = Math.max(0, Math.min(1, (t - i * 0.22) / 0.78));
+        w.scale.set(k * (1 + 1.6 * easeOut(u)), 1, k * (1 + 1.6 * easeOut(u)));
+        w.material.opacity = u <= 0 ? 0 : (1 - u) * (i ? 0.6 : 1);
+      });
+      beam.material.opacity = Math.sin(Math.PI * t) * 0.75;
+      tile.grp.position.y = Math.sin(Math.PI * Math.min(1, t * 1.6)) * R * 0.22;
+      flash.v = Math.sin(Math.PI * t);
+    });
+    tile.grp.position.y = 0;
+    flash.v = 0;
+    waves.forEach(w => { w.visible = false; });
+    beam.visible = false;
+  }
+
+  function tileScreen(n) {
+    const v = P3(n).project(camera), r = el.getBoundingClientRect();
+    return { x: r.left + ((v.x + 1) / 2) * r.width, y: r.top + ((1 - v.y) / 2) * r.height };
   }
 
   let active = 0, activeColor = new THREE.Color(), turnIdx = 0;
@@ -424,7 +553,17 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
     for (const t of tiles) {
       if (t.n === active) t.ringMat.color.copy(t.base).lerp(activeColor.clone().multiplyScalar(2.2), 0.35 + 0.35 * pulse).multiplyScalar(1 + 0.4 * pulse);
       else t.ringMat.color.copy(t.base);
+      const f = t.n === flash.n ? flash.v : 0;
+      if (f) t.ringMat.color.multiplyScalar(1 + 1.5 * f);
+      t.face.material.color.setScalar(1.05 + 0.9 * f);
     }
+    // Ombre et éclat suivent le dé
+    const lift = Math.max(0, die.position.y - dieHalf());
+    dieShadow.position.x = dieGlow.position.x = die.position.x;
+    dieShadow.position.z = dieGlow.position.z = die.position.z;
+    dieShadow.material.opacity = 0.8 / (1 + lift / (R * 1.5));
+    glowLevel *= Math.exp(-dt * 5);
+    dieGlow.material.opacity = glowLevel;
     pawns.forEach((pw, i) => {
       const bob = i === turnIdx ? Math.sin(now / 300 + pw.phase) * 0.12 : 0;
       pw.heart.position.y = 0.16 + (23 * pawnScale) / 2 + Math.max(0, bob);
@@ -444,7 +583,7 @@ export async function createBoard(el, { count, typeAt, levelColorAt, types, play
   window.addEventListener('orientationchange', () => setTimeout(() => { if (running) fit(); }, 350));
 
   return {
-    start, stop, setLevels, placePawns, hopPawn, swapPawns, rollDie, setActive,
+    start, stop, setLevels, placePawns, hopPawn, swapPawns, rollDie, landOn, tileScreen, setActive,
     setInsets(next) { insets = { top: 0, bottom: 0, left: 0, right: 0, ...next }; if (running) fit(); },
     resetView: fit,
   };

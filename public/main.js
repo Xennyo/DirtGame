@@ -154,16 +154,15 @@ function renderHud() {
 
 function renderCard() {
   const c = S.card; if (!c) return;
-  const lv = NEON, P = S.players;
-  $('cardSheet').style.boxShadow = `0 0 0 3px ${lv.color}, 0 0 60px ${lv.glow}`;
+  const P = S.players;
+  // Couleur selon le type de carte (jamais selon l'intensité)
+  $('cardSheet').style.setProperty('--c', c.type === 'A' ? NEON.color : '#62c7ff');
   $('cardType').textContent = c.type === 'A' ? 'Action' : 'Vérité';
-  $('cardType').style.color = lv.color;
   $('cardPawn').style.background = PCOL[c.player];
   $('cardFor').textContent = `Pour ${P[c.player].name}${c.given ? ` · offert par ${P[1 - c.player].name}` : ''}`;
   $('cardText').textContent = c.text;
   $('cardText').className = `card-text${c.text.length > 110 ? ' len-l' : c.text.length > 70 ? ' len-m' : ''}`;
   $('timer').style.display = c.dur ? 'flex' : 'none';
-  $('timerBar').style.background = lv.color;
   const j = P[c.player].jokers;
   $('useJoker').style.display = j > 0 ? 'block' : 'none';
   $('useJoker').textContent = `★ Utiliser mon joker (${j})`;
@@ -176,9 +175,8 @@ function renderTimer() {
 }
 
 function renderChoice() {
-  const P = S.players, lv = NEON, chooser = P[S.choiceFor];
-  const col = S.choiceGiven ? '#ffd23f' : lv.color, glow = S.choiceGiven ? 'rgba(255,210,63,.45)' : lv.glow;
-  $('choiceSheet').style.boxShadow = `0 0 0 3px ${col}, 0 0 60px ${glow}`;
+  const P = S.players, chooser = P[S.choiceFor];
+  $('choiceSheet').style.setProperty('--c', S.choiceGiven ? '#ffd23f' : NEON.color);
   $('choiceTitle').textContent = S.choiceGiven ? 'GAGE À DONNER' : 'CHOIX LIBRE';
   $('choiceText').textContent = S.choiceGiven ? `${P[S.turn].name}, quel gage pour ${chooser.name} ?` : `${chooser.name}, à toi de choisir.`;
 }
@@ -281,6 +279,20 @@ function showCard() {
   S.timerLeft = S.timerTotal = S.card.dur; S.timerRunning = false;
   renderCard();
   modal('mCard');
+  flipCard();
+}
+// La carte part de la case du pion et se retourne en venant au centre
+function flipCard() {
+  const sh = $('cardSheet'), m = $('mCard');
+  sh.classList.remove('flip');
+  const r = sh.getBoundingClientRect();
+  const from = board ? board.tileScreen(S.players[S.turn].pos) : { x: innerWidth / 2, y: innerHeight };
+  sh.style.setProperty('--fx', `${Math.round(from.x - (r.left + r.width / 2))}px`);
+  sh.style.setProperty('--fy', `${Math.round(from.y - (r.top + r.height / 2))}px`);
+  void sh.offsetWidth;
+  m.classList.add('flying');
+  sh.classList.add('flip');
+  sh.addEventListener('animationend', () => m.classList.remove('flying'), { once: true });
 }
 
 async function roll() {
@@ -297,7 +309,7 @@ async function roll() {
     await toast('Dépassement !', `Il fallait faire ${need} pour arriver pile. ${name} recule de ${over} case${over > 1 ? 's' : ''} → case ${COUNT - over}.`, '#ffd23f');
     await moveTo(p, COUNT - over);
   }
-  await wait(250);
+  if (board) await board.landOn(S.players[p].pos, PCOL[p]); else await wait(250);
   resolve(p, false);
 }
 
@@ -320,7 +332,7 @@ async function resolve(p, chained) {
     const to = Math.max(1, pos - 3);
     await toast('Recul !', `${pl.name} recule de 3 cases → case ${to}.`, '#ff7a4a');
     await moveTo(p, to);
-    await wait(200);
+    if (board) await board.landOn(to, PCOL[p]); else await wait(200);
     return resolve(p, true);
   }
   if (type === 'E') {
