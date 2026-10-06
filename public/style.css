@@ -97,8 +97,42 @@ button{cursor:pointer}
 .modal.on{display:flex}
 .card-modal{align-items:flex-start;overflow-y:auto;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
 .card-sheet{max-width:440px;margin:auto 0;gap:16px;border-radius:34px;padding:22px 24px 22px;min-height:min(620px,calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom)))}
-.modal.on .card-sheet{animation:cardIn .5s cubic-bezier(.2,.9,.3,1.15)}
-@keyframes cardIn{from{opacity:0;transform:perspective(900px) rotateY(-70deg) scale(.85)}to{opacity:1;transform:none}}
+/* Carte : part de la case du pion, vole au centre et se retourne (le dos montre le logo) */
+.card-modal.flying{overflow:hidden}
+.card-sheet{position:relative;transform-style:preserve-3d}
+.card-sheet::before{content:'Dirty\A Game';white-space:pre;position:absolute;inset:0;border-radius:inherit;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:'Yellowtail',cursive;font-size:84px;line-height:.85;color:#ffe6f3;text-shadow:0 0 3px #fff,0 0 12px var(--c),0 0 30px var(--c),0 0 60px var(--c);
+  background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c) 30%,transparent),transparent 62%),repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px),#160c1a;
+  box-shadow:inset 0 0 0 10px #160c1a,inset 0 0 0 12px var(--c);
+  transform:rotateY(180deg) translateZ(1px);backface-visibility:hidden;-webkit-backface-visibility:hidden;pointer-events:none;visibility:hidden}
+.card-sheet.flip::before{visibility:visible}
+.card-sheet.flip>*{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card-sheet.flip{animation:cardFly .8s cubic-bezier(.25,.75,.3,1) both}
+@keyframes cardFly{
+  0%{transform:perspective(1400px) translate(var(--fx),var(--fy)) scale(.08) rotateY(180deg)}
+  45%{transform:perspective(1400px) translate(calc(var(--fx) * .15),calc(var(--fy) * .15)) scale(.8) rotateY(180deg)}
+  100%{transform:perspective(1400px) translate(0,0) scale(1) rotateY(0deg)}}
+.modal.on{animation:fadeIn .25s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Fenêtres néon (carte, choix, joker) : fond sombre velouté, bord lumineux de la couleur --c */
+.neon-sheet{--c:#ff3fa4;--g:color-mix(in srgb,var(--c) 45%,transparent);color:#fff;background-color:#140b18;
+  background-image:radial-gradient(130% 55% at 50% 0%,color-mix(in srgb,var(--c) 20%,transparent),transparent 70%),radial-gradient(90% 50% at 50% 110%,rgba(140,40,200,.22),transparent 70%),radial-gradient(rgba(255,255,255,.04) .6px,transparent .9px);
+  background-size:auto,auto,4px 4px;box-shadow:0 0 0 2px var(--c),0 0 26px var(--g),0 0 80px color-mix(in srgb,var(--c) 22%,transparent),inset 0 0 24px color-mix(in srgb,var(--c) 18%,transparent)}
+.neon-sheet .rule{height:2px;background:var(--c);box-shadow:0 0 8px var(--c),0 0 18px var(--g)}
+.neon-sheet .sheet-title{color:#fff;text-shadow:0 0 10px var(--g)}
+.neon-sheet .btn-ink{background:#fff;color:#111;border-color:#fff;box-shadow:5px 5px 0 var(--c),0 0 26px var(--g)}
+.neon-sheet .btn-ink:active{box-shadow:2px 2px 0 var(--c),0 0 18px var(--g)}
+.neon-sheet .opt{background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.22);color:#fff}
+.neon-sheet .opt:hover,.neon-sheet .opt:active{background:var(--c);border-color:var(--c);color:#111;box-shadow:0 0 22px var(--g)}
+.neon-sheet .card-kind{color:#fff;text-shadow:0 0 4px #fff,0 0 12px var(--c),0 0 28px var(--c),0 0 50px var(--g)}
+.neon-sheet .card-for{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16)}
+.neon-sheet .card-text{color:#fff5fa;text-shadow:0 1px 14px rgba(0,0,0,.6)}
+.neon-sheet .timer{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.2)}
+.neon-sheet .timer-track{background:rgba(255,255,255,.1)}
+.neon-sheet .timer-bar{background:var(--c);box-shadow:0 0 10px var(--c)}
+.neon-sheet .timer-btn{background:var(--c);color:#111}
+.joker-btn{background:rgba(255,210,63,.08);color:#ffd23f;border:1.5px solid rgba(255,210,63,.45);padding:11px;font-size:15px;text-shadow:0 0 8px rgba(255,210,63,.6)}
 .card-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .card-kind{font-family:'Yellowtail',cursive;font-size:62px;line-height:.9;padding:0 6px 2px 0;color:#ff3fa4;transform:rotate(-4deg);transform-origin:left bottom}
 .card-for{display:inline-flex;align-items:center;gap:7px;background:#111;color:#fff;border-radius:99px;padding:7px 13px 7px 9px;font-weight:800;font-size:14px;margin-bottom:6px}
